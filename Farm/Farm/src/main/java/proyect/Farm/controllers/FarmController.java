@@ -65,6 +65,28 @@ public class FarmController {
         }
     }
 
+    @PostMapping("/sell-eggs")
+    public ResponseEntity<Void>sellEggs(@RequestBody Map<String,Object> body){
+        Integer amount = Integer.parseInt(body.get("amount").toString());
+        try{
+            farmService.sellEggs(amount);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/sell-chickens")
+    public ResponseEntity<Void>sellChickens(@RequestBody Map<String,Object> body){
+        Integer amount = Integer.parseInt(body.get("amount").toString());
+        try{
+            farmService.sellChickens(amount);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 }
