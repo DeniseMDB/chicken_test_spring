@@ -9,7 +9,7 @@ import proyect.Farm.services.ChickenService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chickens")
+@RequestMapping("api/chickens")
 public class ChickenController {
     @Autowired
     private ChickenService chickenService;
@@ -26,9 +26,9 @@ public class ChickenController {
         return ResponseEntity.ok(chickens);
     }
 
-    @PostMapping
-    public ResponseEntity<Chicken> createChicken(@RequestBody Chicken chicken){
-        Chicken savedChicken = chickenService.save(chicken);
+    @PostMapping("/{farmId}")
+    public ResponseEntity<Chicken> createChicken(@PathVariable Long farmId, @RequestBody Chicken chicken){
+        Chicken savedChicken = chickenService.save(chicken,farmId);
         return ResponseEntity.ok(savedChicken);
     }
 }

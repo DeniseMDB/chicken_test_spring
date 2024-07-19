@@ -9,7 +9,7 @@ import proyect.Farm.services.EggService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/eggs")
+@RequestMapping("api/eggs")
 public class EggController {
     @Autowired
     private EggService eggService;
@@ -20,9 +20,9 @@ public class EggController {
         return ResponseEntity.ok(eggs);
     }
 
-    @PostMapping
-    public ResponseEntity<Egg> createEgg(@RequestBody Egg egg){
-        Egg savedEgg = eggService.save(egg);
+    @PostMapping("/{farmId}")
+    public ResponseEntity<Egg> createEgg(@PathVariable Long farmId,@RequestBody Egg egg){
+        Egg savedEgg = eggService.save(egg, farmId);
         return ResponseEntity.ok(savedEgg);
     }
 }

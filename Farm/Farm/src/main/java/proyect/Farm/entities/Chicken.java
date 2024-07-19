@@ -1,5 +1,6 @@
 package proyect.Farm.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import java.util.Random;
 @Table(name = "chickens")
 @Data
 @PropertySource("farm.properties")
+@JsonIgnoreProperties({"farm"})
 public class Chicken {
 
     @Id
@@ -24,30 +26,21 @@ public class Chicken {
     private String kindOfChicken;
     private Double price;
 
-    @Transient
-    @Value("${CHICKENS.MIN.DAYS.TO.LIVE}")
-    private Integer minDaysToLive;
-    @Transient
-    @Value("${CHICKENS.MAX.DAYS.TO.LIVE")
-    private Integer maxDaysToLive;
-
     @ManyToOne
     @JoinColumn(name = "farm_id")
     private Farm farm;
 
     private static final Random random = new Random();
 
-    public Chicken(Integer ageInDays, Integer daysUntilNextEgg, Boolean isAlive, String kindOfChicken, Double price) {
+    public Chicken(Integer ageInDays, Integer daysUntilNextEgg, Boolean isAlive,Integer daysToLive, String kindOfChicken, Double price) {
         this.ageInDays = ageInDays;
         this.daysUntilNextEgg = daysUntilNextEgg;
         this.isAlive = isAlive;
-        this.daysToLive= initializeDaysToLive();
+        this.daysToLive= daysToLive;
         this.kindOfChicken= kindOfChicken;
+        this.price= price;
     }
 
-    private int initializeDaysToLive() {
-        return minDaysToLive + random.nextInt(maxDaysToLive - minDaysToLive + 1);
-    }
 
     public Chicken() {
     }
