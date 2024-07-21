@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class SimulationService implements Runnable {
 
     @Autowired
-    private FarmService farmService; // Inject the FarmService
+    private FarmService farmService;
 
     private boolean running = true;
     private final Object lock = new Object();
@@ -54,7 +54,7 @@ public class SimulationService implements Runnable {
                 farmService.simulateDay(currentFarmId);
             }
             try {
-                Thread.sleep(speedSimulation*1000); // Se pausa 5 segundos
+                Thread.sleep(speedSimulation*1000); //
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

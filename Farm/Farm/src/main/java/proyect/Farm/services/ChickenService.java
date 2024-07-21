@@ -42,8 +42,11 @@ public class ChickenService {
     }
 
     public synchronized Chicken save(Chicken chicken, Long farmId) {
-        if (chicken.getDaysToLive() == null) {;
+        if (chicken.getDaysToLive() == null) {
             chicken.setDaysToLive(minDaysToLive + random.nextInt(maxDaysToLive - minDaysToLive + 1));
+        }
+        if(chicken.getIsAlive() == null){
+            chicken.setIsAlive(true);
         }
         if(chicken.getDaysUntilNextEgg() == null){
             if(chicken.getAgeInDays() > 20){
