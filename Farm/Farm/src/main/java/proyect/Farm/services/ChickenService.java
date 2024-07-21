@@ -64,15 +64,10 @@ public class ChickenService {
         if (oPfarm.isPresent()) {
             Farm farm = oPfarm.get();
             List<Chicken> chickens = farm.getChickens();
-            System.out.println("cantidad de gallinas en lista de farm "+chickens.size());
-            System.out.println("Eliminando gallina: " + chicken.getId());
             chickens.remove(chicken);
             farm.setChickens(chickens);
-            farmRepository.saveAndFlush(farm);
-            chicken.setFarm(null);
-            chickenRepository.save(chicken);
+            farmRepository.save(farm);
             chickenRepository.deleteById(chicken.getId());
-            System.out.println("cantidad de gallinas luego de eliminar: "+chickens.size());
         } else throw new RuntimeException("Error de farm");
     }
 }

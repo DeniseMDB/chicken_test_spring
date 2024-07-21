@@ -21,11 +21,11 @@ public class FarmReport {
     private Integer totalChickensSold;
     private Double totalEggsRevenue;
     private Double totalChickensRevenue;
-    private Integer maxEggs;
-    private Integer maxChickens;
+    private Integer eggsCapacity;
+    private Integer chickensCapacity;
     private Integer daysInBusiness;
 
-    public FarmReport(Double money, Integer currentChickens, Integer currentEggs, Integer totalEggsSold, Integer totalChickensSold, Double totalEggsRevenue, Double totalChickensRevenue, Integer maxEggs, Integer maxChickens, Integer daysInBusiness) {
+    public FarmReport(Double money, Integer currentChickens, Integer currentEggs, Integer totalEggsSold, Integer totalChickensSold, Double totalEggsRevenue, Double totalChickensRevenue, Integer eggsCapacity, Integer chickensCapacity, Integer daysInBusiness) {
         this.money = money;
         this.currentChickens = currentChickens;
         this.currentEggs = currentEggs;
@@ -33,8 +33,8 @@ public class FarmReport {
         this.totalChickensSold = totalChickensSold;
         this.totalEggsRevenue = totalEggsRevenue;
         this.totalChickensRevenue = totalChickensRevenue;
-        this.maxEggs = maxEggs;
-        this.maxChickens = maxChickens;
+        this.eggsCapacity = eggsCapacity;
+        this.chickensCapacity =chickensCapacity;
         this.daysInBusiness = daysInBusiness;
     }
 

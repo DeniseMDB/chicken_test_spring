@@ -25,30 +25,6 @@ public class FarmController {
         return ResponseEntity.ok(savedFarm);
     }
 
-    @PostMapping("/{id}/start")
-    public ResponseEntity<Void> startSimulation(@PathVariable Long id) {
-        farmService.startSimulation(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    @PostMapping("/{id}/stop")
-    public ResponseEntity<Void> stopSimulation(@PathVariable Long id) {
-        farmService.stopSimulation(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    @PostMapping("/{id}/pause")
-    public ResponseEntity<Void> pauseSimulation(@PathVariable Long id) {
-        farmService.pauseSimulation(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    @PostMapping("/{id}/resume")
-    public ResponseEntity<Void> resumeSimulation(@PathVariable Long id) {
-        farmService.resumeSimulation(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
     @GetMapping("/{farmId}")
     public ResponseEntity<Farm> findById(@PathVariable Long farmId) {
         try {

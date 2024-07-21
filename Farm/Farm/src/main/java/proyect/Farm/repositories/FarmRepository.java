@@ -13,5 +13,5 @@ import proyect.Farm.entities.Farm;
 import java.util.List;
 
 @Repository
-public interface FarmRepository extends JpaRepository<Farm, Long> {
+public interface FarmRepository extends CrudRepository<Farm, Long> {
 }

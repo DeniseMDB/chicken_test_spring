@@ -24,12 +24,12 @@ public class FarmReportService {
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
             List<Sales> sales = salesRepository.findByFarm_Id(farm.getId());
-
             int totalEggsSold = 0;
             int totalChickensSold = 0;
             double totalEggsRevenue = 0;
             double totalChickensRevenue = 0;
-
+            int chickensCapacity = farm.getMaxChickens() - farm.getChickens().size();
+            int eggsCapacity = farm.getMaxEggs() - farm.getEggs().size();
             for (Sales sale : sales) {
                 if (sale.getItemType().equals("egg")) {
                     totalEggsSold += sale.getQuantity();
@@ -48,8 +48,8 @@ public class FarmReportService {
                     totalChickensSold,
                     totalEggsRevenue,
                     totalChickensRevenue,
-                    farm.getMaxEggs(),
-                    farm.getMaxChickens(),
+                    eggsCapacity,
+                    chickensCapacity,
                     farm.getDaysInBusiness()
             );
         } else {
