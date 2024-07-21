@@ -1,8 +1,10 @@
 package proyect.Farm.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Chicken;
 import proyect.Farm.entities.Farm;
@@ -14,6 +16,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@Transactional
 @PropertySource("farm.properties")
 public class ChickenService {
 
@@ -34,14 +37,20 @@ public class ChickenService {
         return (List<Chicken>) chickenRepository.findAll();
     }
 
-    public List<Chicken> findAllAlive() {
-        return (List<Chicken>) chickenRepository.findChickensAlive(true);
+    public List<Chicken> findChickensByStatus(Long farmId, Boolean isAlive) {
+        return (List<Chicken>) chickenRepository.findChickensByStatus(farmId, isAlive);
     }
 
-    public Chicken save(Chicken chicken, Long farmId) {
-        if (chicken.getDaysToLive() == null) {
-            System.out.println(minDaysToLive);
+    public synchronized Chicken save(Chicken chicken, Long farmId) {
+        if (chicken.getDaysToLive() == null) {;
             chicken.setDaysToLive(minDaysToLive + random.nextInt(maxDaysToLive - minDaysToLive + 1));
+        }
+        if(chicken.getDaysUntilNextEgg() == null){
+            if(chicken.getAgeInDays() > 20){
+                chicken.setDaysUntilNextEgg(1);
+            }else {
+                chicken.setDaysUntilNextEgg(20 - chicken.getAgeInDays());
+            }
         }
         Optional<Farm> oPfarm = farmRepository.findById(farmId);
         if (oPfarm.isPresent()) {
@@ -50,8 +59,20 @@ public class ChickenService {
         }else throw new RuntimeException("Error de farm");
         return chickenRepository.save(chicken);
     }
-
-    private int initializeDaysToLive() {
-        return minDaysToLive + random.nextInt(maxDaysToLive - minDaysToLive + 1);
+    public void delete(Chicken chicken, Long id) {
+        Optional<Farm> oPfarm = farmRepository.findById(id);
+        if (oPfarm.isPresent()) {
+            Farm farm = oPfarm.get();
+            List<Chicken> chickens = farm.getChickens();
+            System.out.println("cantidad de gallinas en lista de farm "+chickens.size());
+            System.out.println("Eliminando gallina: " + chicken.getId());
+            chickens.remove(chicken);
+            farm.setChickens(chickens);
+            farmRepository.saveAndFlush(farm);
+            chicken.setFarm(null);
+            chickenRepository.save(chicken);
+            chickenRepository.deleteById(chicken.getId());
+            System.out.println("cantidad de gallinas luego de eliminar: "+chickens.size());
+        } else throw new RuntimeException("Error de farm");
     }
 }

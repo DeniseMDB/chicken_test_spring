@@ -1,16 +1,16 @@
 package proyect.Farm.services;
 
+import jakarta.transaction.Transactional;
 import org.hibernate.sql.model.jdbc.OptionalTableUpdateOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.*;
 import proyect.Farm.repositories.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
+@Transactional
 public class FarmService implements Runnable{
     @Autowired
     private FarmRepository farmRepository;
@@ -22,41 +22,50 @@ public class FarmService implements Runnable{
     private SalesRepository saleRepository;
     @Autowired
     private ChickenService chickenService;
+    @Autowired EggService eggService;
 
     private boolean running = true;
     private final Object lock = new Object();
+    private Long currentFarmId; // Para almacenar el ID de la granja actual
 
-    public void startSimulation() {
+    public void startSimulation(Long farmId) {
+        this.currentFarmId = farmId;
         Thread simulationThread = new Thread(this);
         simulationThread.start();
     }
 
-    public void stopSimulation() {
-        running = false;
+    public void stopSimulation(Long farmId) {
+        if (farmId.equals(this.currentFarmId)) {
+            running = false;
+        }
     }
 
-    public void pauseSimulation() {
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+    public void pauseSimulation(Long farmId) {
+        if (farmId.equals(this.currentFarmId)) {
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
     }
 
-    public void resumeSimulation() {
-        synchronized (lock) {
-            lock.notify();
+    public void resumeSimulation(Long farmId) {
+        if (farmId.equals(this.currentFarmId)) {
+            synchronized (lock) {
+                lock.notify();
+            }
         }
     }
-//agregar parametro de tiempo
+
     @Override
     public void run() {
         while (running) {
-            simulateDay();
+            simulateDay(currentFarmId);
             try {
-                Thread.sleep(30000); // Se pausa 30 segundos
+                Thread.sleep(5000); // Se pausa 30 segundos
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -65,14 +74,28 @@ public class FarmService implements Runnable{
             }
         }
     }
-
-    public void simulateDay() {
-        ageEggs();
-        ageChickens();
-        Optional<Farm> optionalFarm = farmRepository.findById(1L);
+    @Transactional
+    public void simulateDay(Long farmId) {
+        Optional<Farm> optionalFarm = farmRepository.findById(farmId);
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
+            farm.getChickens().size();
+            farm.getEggs().size();
+            List<Chicken> deadChickens = chickenRepository.findChickensByStatus(farm.getId(),false);
+            if(!deadChickens.isEmpty()) {
+                System.out.println("Entro a lista de gallinas muertas");
+                for (Chicken chicken : deadChickens) {
+                    List<Chicken> chickens = farm.getChickens();
+                    chickens.remove(chicken);
+                    farm.setChickens(chickens);
+                    chickenRepository.deleteById(chicken.getId());
+                }
+            }
+            ageChickens(farm);
+            ageEggs(farm);
             farm.setDaysInBusiness(farm.getDaysInBusiness() + 1);
+            farmRepository.save(farm);
+            System.out.println("A full day has passed.");
         }
     }
 
@@ -88,11 +111,8 @@ public class FarmService implements Runnable{
             if(totalPrice < farm.getMoney()){
                 farm.setMoney(farm.getMoney()-totalPrice); // asi o con queries?
                 for(int i = 0; i < amount; i++){
-                    Random random = new Random();
-                    int daysToHatch = random.nextInt(21 - 1 + 1) + 1;
-                    Egg egg= new Egg(0,0.75,daysToHatch);
-                    egg.setFarm(farm);
-                    eggRepository.save(egg);
+                    Egg egg= new Egg(null,0.75,null, "bought");
+                    eggService.save(egg,id);
                     farm.getEggs().add(egg);
                 }
                 farmRepository.save(farm);
@@ -112,7 +132,7 @@ public class FarmService implements Runnable{
             if(totalPrice < farm.getMoney()){
                 farm.setMoney(farm.getMoney()-totalPrice); // asi o con queries?
                 for(int i = 0; i < amount; i++){
-                    Chicken chicken= new Chicken(chickenAgeInDays,1,true,null,"bought",55.0);
+                    Chicken chicken= new Chicken(chickenAgeInDays,null,true,null,"bought",55.0);
                     chickenService.save(chicken, farm.getId());
                     farm.getChickens().add(chicken);
                 }
@@ -131,12 +151,13 @@ public class FarmService implements Runnable{
             Farm farm = optionalFarm.get();
             if (amount <= farm.getEggs().size()) {
                 Double totalSale = 0.0;
+                List<Egg> eggs = farm.getEggs();
                 for (int i = 0; i < amount; i++) {
                     Egg egg = farm.getEggs().get(0);
                     totalSale += egg.getPrice();
                     eggRepository.delete(egg);
-                    farm.getEggs().remove(egg);
-                    farmRepository.save(farm);
+                    eggs.remove(egg);
+                    farm.setEggs(eggs);
                 }
                 farm.setMoney(farm.getMoney() + totalSale);
                 Sales sale = new Sales("egg", amount, totalSale);
@@ -160,31 +181,17 @@ public class FarmService implements Runnable{
                 double totalSale = 0;
                 List<Chicken> chickens = farm.getChickens();
                 for (int i = 0; i < amount; i++) {
-                    Chicken chicken = chickens.get(i); // O usar chickens.get(0) si siempre se elimina el primero
+                    Chicken chicken = chickens.get(0); //
                     totalSale += chicken.getPrice();
                     chickenRepository.delete(chicken);
                     chickens.remove(chicken);
+                    farm.setChickens(chickens);
                 }
-                /*
-                public void sellChickens(Integer amount, Long farmId){
-                    Optional<Farm> optionalFarm = farmRepository.findById(farmId);
-                    if (optionalFarm.isPresent()) {
-                        Farm farm = optionalFarm.get();
-                        if (amount <= farm.getChickens().size()) {
-                            double totalSale = 0;
-                            for (int i = 0; i < amount; i++) {
-                                Chicken chicken = farm.getChickens().get(0);
-                                totalSale += chicken.getPrice();
-                                chickenRepository.delete(chicken);
-                                farm.getChickens().remove(chicken);
-                }
-                 */
                 farm.setMoney(farm.getMoney() + totalSale);
                 Sales sale = new Sales("chicken", amount, totalSale);
                 sale.setFarm(farm);
                 saleRepository.save(sale);
                 farm.getSales().add(sale);
-                farm.setChickens(chickens);
                 farmRepository.save(farm);
             } else {
                 throw new RuntimeException("Not enough amount of chickens to sell");
@@ -194,42 +201,52 @@ public class FarmService implements Runnable{
         }
     }
 
-    public void ageEggs(){
-        Iterable<Egg> eggsList = eggRepository.findAll();
-        for(Egg egg : eggsList){
-            egg.setAgeInDays(egg.getAgeInDays()+1);
-            if(egg.getDaysToHatch() >=egg.getAgeInDays()){
-                hatchEggs(egg);
-            }else{
+    public void ageEggs(Farm farm) {
+        List<Egg> eggsList = new ArrayList<>(farm.getEggs());
+        for (Egg egg : eggsList) {
+            egg.setAgeInDays(egg.getAgeInDays() + 1);
+            egg.setDaysToHatch(egg.getDaysToHatch() - 1);
+            if (egg.getDaysToHatch() <= 0) {
+                hatchEggs(egg, farm);
+            } else {
                 eggRepository.save(egg);
             }
         }
+        farmRepository.save(farm);
     }
 
-    public void ageChickens(){
-        Iterable<Chicken> chickenList = chickenRepository.findAll();
-        for(Chicken chicken : chickenList){
-            chicken.setAgeInDays(chicken.getAgeInDays()+1);
-            if(chicken.getAgeInDays() >= chicken.getDaysToLive()){
-                chicken.setIsAlive(false);
-                chickenRepository.delete(chicken);
-            }else{
+    public void ageChickens(Farm farm) {
+        List<Chicken> chickenList = new ArrayList<>(farm.getChickens());
+        List<Chicken> chickensToRemove = new ArrayList<>();
+        for (Chicken chicken : chickenList) {
+            if (chicken.getDaysUntilNextEgg() == 0){
+                Egg egg= new Egg(0,0.50,21, "hatched");
+                eggService.save(egg,farm.getId());
+                farm.getEggs().add(egg);
+                chicken.setDaysUntilNextEgg(2);
+            }
+            chicken.setAgeInDays(chicken.getAgeInDays() + 1);
+            chicken.setDaysToLive(chicken.getDaysToLive() - 1);
+            chicken.setDaysUntilNextEgg(chicken.getDaysUntilNextEgg()-1);
+            if (chicken.getDaysToLive() <= 0) {
+                chicken.setIsAlive(false);// Añadir a la lista temporal
+            } else {
                 chickenRepository.save(chicken);
             }
         }
+        farm.setChickens(chickenList);
+        farmRepository.save(farm);
     }
 
-    public void hatchEggs(Egg egg) {
-        Optional<Farm> optionalFarm = farmRepository.findById(egg.getFarm().getId());
-        if (optionalFarm.isPresent()) {
-            Farm farm = optionalFarm.get();
-            eggRepository.delete(egg);
-            Chicken chicken = new Chicken(0, 20, true,null,"born",45.0);
-            chickenService.save(chicken, farm.getId());
-            farm.getChickens().add(chicken);
-            farm.getEggs().remove(egg);
-            farmRepository.save(farm);
-        }
+    public void hatchEggs(Egg egg, Farm farm) {
+        eggRepository.delete(egg);
+        Chicken chicken = new Chicken(0, 20, true, null, "born", 45.0);
+        chickenService.save(chicken, farm.getId());
+        farm.getChickens().add(chicken);
+        List<Egg> eggs = farm.getEggs();
+        eggs.remove(egg);
+        farm.setEggs(eggs);
+        farmRepository.save(farm);
     }
 
     public Farm findById(Long id){

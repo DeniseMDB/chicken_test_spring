@@ -11,6 +11,7 @@ import proyect.Farm.repositories.FarmRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @PropertySource("farm.properties")
@@ -20,7 +21,10 @@ public class EggService {
     @Autowired
     private FarmRepository farmRepository;
     @Value("${EGGS.DAYS.TO.HATCH}")
-    private Integer daysToHatch;
+    private Integer daysToHatchFromBirth;
+
+    Random random = new Random();
+    int randomizedDaysToHatch = 0;
 
     public List<Egg> findAll(){
         return (List<Egg>) eggRepository.findAll();
@@ -28,7 +32,11 @@ public class EggService {
 
     public Egg save(Egg egg, Long farmId){
         if(egg.getDaysToHatch() == null){
-            egg.setDaysToHatch(daysToHatch);
+            this.randomizedDaysToHatch = (random.nextInt(daysToHatchFromBirth) + 1);
+            egg.setDaysToHatch(randomizedDaysToHatch);
+        }
+        if(egg.getAgeInDays() == null){
+            egg.setAgeInDays(daysToHatchFromBirth - randomizedDaysToHatch);
         }
         Optional<Farm> oPfarm = farmRepository.findById(farmId);
         if (oPfarm.isPresent()) {

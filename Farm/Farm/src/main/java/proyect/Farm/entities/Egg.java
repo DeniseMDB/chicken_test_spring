@@ -20,11 +20,13 @@ public class Egg {
     private Integer ageInDays;
     @Value("${EGGS.DAYS.TO.HATCH}")
     private Integer daysToHatch;
+    private String hatchedOrBought;
 
-    public Egg(Integer ageInDays, Double price,Integer daysToHatch) {
+    public Egg(Integer ageInDays, Double price,Integer daysToHatch, String hatchedOrBought) {
         this.ageInDays = ageInDays;
         this.price = price;
         this.daysToHatch = daysToHatch;
+        this.hatchedOrBought = hatchedOrBought;
     }
 
     @ManyToOne

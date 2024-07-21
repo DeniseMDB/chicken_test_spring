@@ -20,9 +20,9 @@ public class ChickenController {
         return ResponseEntity.ok(chickens);
     }
 
-    @GetMapping("/alive")
-    public ResponseEntity<List<Chicken>> getAllAliveChickens(){
-        List<Chicken> chickens = chickenService.findAllAlive();
+    @GetMapping("/{farmId}")
+    public ResponseEntity<List<Chicken>> getAllAliveChickens(@PathVariable Long farmId){
+        List<Chicken> chickens = chickenService.findChickensByStatus(farmId, true);
         return ResponseEntity.ok(chickens);
     }
 

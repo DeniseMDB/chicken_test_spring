@@ -37,4 +37,7 @@ public class FarmReport {
         this.maxChickens = maxChickens;
         this.daysInBusiness = daysInBusiness;
     }
+
+    public FarmReport() {
+    }
 }
