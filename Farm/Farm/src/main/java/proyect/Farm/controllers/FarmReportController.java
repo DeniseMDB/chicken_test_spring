@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import proyect.Farm.entities.FarmReport;
 import proyect.Farm.services.FarmReportService;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @RestController
 @RequestMapping("api/farm/report")
 @Tag(name = "Farm Report Controller", description = "Controls to manage farm reports")
@@ -37,6 +41,32 @@ public class FarmReportController {
         try {
             FarmReport farmReport = farmReportService.generateFarmReport(id);
             return ResponseEntity.ok(farmReport);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Generate CSV farm report by ID", description = "Generate and download the farm report in CSV format for a specific farm by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "CSV farm report generated successfully",
+                    content = { @Content(mediaType = "text/csv") }),
+            @ApiResponse(responseCode = "404", description = "Farm report not found for the specified ID",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content) })
+    @GetMapping("/{id}/csv")
+    public ResponseEntity<String> generateCsvFarmReport(@PathVariable Long id) {
+        try {
+            String filePath = "/farm_report_" + id + ".csv";
+            Path path = Paths.get("reports");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            farmReportService.writeFarmReportToCSV(id, filePath);
+
+            return ResponseEntity.ok(filePath);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {

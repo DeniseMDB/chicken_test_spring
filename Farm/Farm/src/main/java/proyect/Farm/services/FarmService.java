@@ -1,5 +1,6 @@
 package proyect.Farm.services;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import proyect.Farm.entities.*;
 import proyect.Farm.repositories.*;
 
 import java.util.*;
+import org.slf4j.Logger;
 
 @Service
 @Transactional
@@ -25,6 +27,8 @@ public class FarmService {
     @Autowired
     private EggService eggService;
 
+    private static final Logger logger = LoggerFactory.getLogger(FarmService.class);
+
     public void simulateDay(Long farmId) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
         if (optionalFarm.isPresent()) {
@@ -35,17 +39,17 @@ public class FarmService {
                 double calculatedAmount = eggsInStock * 0.20;
                 Integer eggsToSell = (int) Math.round(calculatedAmount);
                 sellEggs(eggsToSell,farm.getId(),0.75);
-                System.out.println("Se han vendido "+ eggsToSell+" huevos por alcanzar el limite de stock en granja");
+                logger.info("SE HAN VENDIDO "+ eggsToSell+" HUEVOS CON DESCUENTO POR ALCANZAR EL LIMITE DE STOCK DE LA GRANJA");
             }
             if (chickensInStock >= farm.getMaxChickens()){ //control de stock de gallinas
                 double calculatedAmount = chickensInStock * 0.20;
                 Integer chickensToSell = (int) Math.round(calculatedAmount);
                 sellEggs(chickensToSell,farm.getId(),0.75);
-                System.out.println("Se han vendido "+ chickensToSell+" gallinas por alcanzar el limite de stock en granja");
+                logger.info("SE HAN VENDIDO "+ chickensToSell+" GALLINAS CON DESCUENTO POR ALCANZAR EL LIMITE DE STOCK DE LA GRANJA");
             }
             List<Chicken> deadChickens = chickenRepository.findChickensByStatus(farm.getId(), false);
             if (!deadChickens.isEmpty()) { //desecha gallinas muertas
-                System.out.println("Se desecharon "+ deadChickens.size()+" gallinas muertas.");
+                logger.info("SE DESECHARON "+ deadChickens.size()+" GALLINAS MUERTAS.");
                 for (Chicken chicken : deadChickens) {
                     chickenService.delete(chicken,farm.getId());
                 }
@@ -54,7 +58,7 @@ public class FarmService {
             ageEggs(farm);
             farm.setDaysInBusiness(farm.getDaysInBusiness() + 1);
             farmRepository.save(farm);
-            System.out.println("A full day has passed.");
+            logger.info("A FULL DAY HAS GONE BY.");
         }
     }
 

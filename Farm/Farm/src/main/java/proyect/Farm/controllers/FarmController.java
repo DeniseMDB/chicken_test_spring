@@ -87,7 +87,7 @@ public class FarmController {
                     )))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Eggs bought successfully",
-                    content = { @Content(mediaType = "application/json",
+                    content = { @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Eggs bought successfully. 1 eggs have been added to the farm stock."))}),
             @ApiResponse(responseCode = "400", description = "Bad request",
@@ -118,7 +118,7 @@ public class FarmController {
                     )))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Chickens bought successfully",
-                    content = { @Content(mediaType = "application/json",
+                    content = { @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Chickens bought successfully. 1 chickens have been added to stock."))}),
             @ApiResponse(responseCode = "400", description = "Bad request",
@@ -150,7 +150,7 @@ public class FarmController {
                     )))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Eggs sold successfully",
-                    content = { @Content(mediaType = "application/json",
+                    content = { @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Eggs sold successfully"))}),
             @ApiResponse(responseCode = "404", description = "Farm or eggs not found",
@@ -180,7 +180,7 @@ public class FarmController {
                     )))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Chickens sold successfully",
-                    content = { @Content(mediaType = "application/json",
+                    content = { @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Chickens sold successfully")) }),
             @ApiResponse(responseCode = "404", description = "Farm or chickens not found",

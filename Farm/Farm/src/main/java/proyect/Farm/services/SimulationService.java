@@ -2,9 +2,10 @@ package proyect.Farm.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import proyect.Farm.business.ISimulation;
 
 @Service
-public class SimulationService implements Runnable {
+public class SimulationService implements Runnable, ISimulation {
 
     @Autowired
     private FarmService farmService;
