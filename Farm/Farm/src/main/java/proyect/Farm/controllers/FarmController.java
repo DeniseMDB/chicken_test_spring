@@ -161,7 +161,7 @@ public class FarmController {
     public ResponseEntity<String> sellEggs(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Integer amount = Integer.parseInt(body.get("amount").toString());
         try {
-            farmService.sellEggs(amount, id);
+            farmService.sellEggs(amount, id,null);
             return ResponseEntity.ok("Eggs sold successfully");
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm or eggs not found");
@@ -191,7 +191,7 @@ public class FarmController {
     public ResponseEntity<String> sellChickens(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Integer amount = Integer.parseInt(body.get("amount").toString());
         try {
-            farmService.sellChickens(amount, id);
+            farmService.sellChickens(amount, id, null);
             return ResponseEntity.ok("Chickens sold successfully");
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm or eggs not found");

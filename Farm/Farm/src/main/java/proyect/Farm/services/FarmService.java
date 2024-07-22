@@ -29,11 +29,23 @@ public class FarmService {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
-            farm.getChickens().size(); // Inicializa la colección LAZY
-            farm.getEggs().size(); // Inicializa la colección LAZY
+            Integer chickensInStock = farm.getChickens().size(); // Inicializa la colección LAZY
+            Integer eggsInStock = farm.getEggs().size();// Inicializa la colección LAZY
+            if (eggsInStock >= farm.getMaxEggs()){ //control de stock de huevos
+                double calculatedAmount = eggsInStock * 0.20;
+                Integer eggsToSell = (int) Math.round(calculatedAmount);
+                sellEggs(eggsToSell,farm.getId(),0.75);
+                System.out.println("Se han vendido "+ eggsToSell+" huevos por alcanzar el limite de stock en granja");
+            }
+            if (chickensInStock >= farm.getMaxChickens()){ //control de stock de gallinas
+                double calculatedAmount = chickensInStock * 0.20;
+                Integer chickensToSell = (int) Math.round(calculatedAmount);
+                sellEggs(chickensToSell,farm.getId(),0.75);
+                System.out.println("Se han vendido "+ chickensToSell+" gallinas por alcanzar el limite de stock en granja");
+            }
             List<Chicken> deadChickens = chickenRepository.findChickensByStatus(farm.getId(), false);
-            if (!deadChickens.isEmpty()) {
-                System.out.println("Entro a lista de gallinas muertas");
+            if (!deadChickens.isEmpty()) { //desecha gallinas muertas
+                System.out.println("Se desecharon "+ deadChickens.size()+" gallinas muertas.");
                 for (Chicken chicken : deadChickens) {
                     chickenService.delete(chicken,farm.getId());
                 }
@@ -92,8 +104,14 @@ public class FarmService {
         }
     }
 
-    public void sellEggs(Integer amount, Long farmId) {
+    public void sellEggs(Integer amount, Long farmId, Double discount) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
+        Double discountToApply = 0.0;
+        if (discount == null) {
+            discountToApply = 1.00;
+        }else{
+            discountToApply = discount;
+        }
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
             if (amount <= farm.getEggs().size()) {
@@ -101,7 +119,7 @@ public class FarmService {
                 List<Egg> eggs = farm.getEggs();
                 for (int i = 0; i < amount; i++) {
                     Egg egg = farm.getEggs().get(0);
-                    totalSale += egg.getPrice();
+                    totalSale += egg.getPrice()*discountToApply;
                     eggRepository.delete(egg);
                     eggs.remove(egg);
                     farm.setEggs(eggs);
@@ -120,8 +138,14 @@ public class FarmService {
         }
     }
 
-    public void sellChickens(Integer amount, Long farmId) {
+    public void sellChickens(Integer amount, Long farmId, Double discount) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
+        Double discountToApply = 0.0;
+        if (discount == null) {
+            discountToApply = 1.00;
+        }else{
+            discountToApply = discount;
+        }
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
             if (amount <= farm.getChickens().size()) {
@@ -129,7 +153,7 @@ public class FarmService {
                 List<Chicken> chickens = farm.getChickens();
                 for (int i = 0; i < amount; i++) {
                     Chicken chicken = chickens.get(0);
-                    totalSale += chicken.getPrice();
+                    totalSale += chicken.getPrice()*discountToApply;
                     chickenRepository.delete(chicken);
                     chickens.remove(chicken);
                     farm.setChickens(chickens);
@@ -204,4 +228,5 @@ public class FarmService {
             throw new RuntimeException("Farm does not exist");
         }
     }
+
 }
