@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        .farm-report {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            align-item: center;
+            margin-top: 40px;
+        }
+        .simulation {
+            background-color: #A9A9A9;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-item: center;
+            margin-top: 40px;
+        }
+    </style>
+    <title>Farm Application</title>
+</head>
+<body>
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-4 themed-grid-col">
+            <h1 class="display-4" style="font-family: math;margin-top: 40px;margin-left: 80px;font-weight: bold;"> Farm Report</h1>
+            <div class="farm-report" style="font-family: math;border-style: groove;">
+                <p><strong>Money:</strong> <span th:text="${farm.money}"></span></p>
+                <p><strong>Current Chickens:</strong> <span th:text="${farm.currentChickens}"></span></p>
+                <p><strong>Current Eggs:</strong> <span th:text="${farm.currentEggs}"></span></p>
+                <p><strong>Total Eggs Sold:</strong> <span th:text="${farm.totalEggsSold}"></span></p>
+                <p><strong>Total Chickens Sold:</strong> <span th:text="${farm.totalChickensSold}"></span></p>
+                <p><strong>Total Eggs Revenue:</strong> <span th:text="${farm.totalEggsRevenue}"></span></p>
+                <p><strong>Total Chickens Revenue:</strong> <span th:text="${farm.totalChickensRevenue}"></span></p>
+                <p><strong>Eggs Capacity:</strong> <span th:text="${farm.eggsCapacity}"></span></p>
+                <p><strong>Chickens Capacity:</strong> <span th:text="${farm.chickensCapacity}"></span></p>
+                <p><strong>Days in Business:</strong> <span th:text="${farm.daysInBusiness}"></span></p>
+            </div>
+        </div>
+        <div class="col-md-8 themed-grid-col text-center">
+            <h2 style="margin-top: 40px; font-family: math;font-weight: bold;" >Simulation Controls</h2>
+            <div class="pb-3 simulation">
+                <form th:action="@{/api/simulation/start/{farmId}(farmId=${farm.id})}" method="post">
+                    <label for="speed" style="font-family: math">Speed (every x amount of seconds a day goes by):</label>
+                    <input class="mx-6" type="number" id="speed" name="speed" min="1" aria-label="Speed" placeholder="Enter a number" required>
+                    <button class="btn btn-success rounded-pill px-3" type="submit" style="margin-right: 10px;margin-left: 10px;border-style: outset;">Start</button>
+                </form>
+                <form th:action="@{api/simulation/stop/{farmId}(farmId=${farm.id})}" method="post">
+                    <button class="btn btn-danger rounded-pill px-3" type="submit" style="border-style: outset">Stop</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

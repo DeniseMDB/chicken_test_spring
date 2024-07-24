@@ -1,18 +1,28 @@
 package proyect.Farm.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
+
     @Value("${Farm-Proyect.openapi.dev-url}")
     private String devUrl;
+
+    private static final String SCHEME_NAME = "bearerAuth";
+    private static final String BEARER_FORMAT = "JWT";
+    private static final String SCHEME = "bearer";
 
     @Bean
     public OpenAPI myOpenAPI() {
@@ -38,7 +48,16 @@ public class OpenApiConfig {
                 .license(mitLicense);
 
         return new OpenAPI()
-                .info(info);
+                .addSecurityItem(new SecurityRequirement().addList(SCHEME_NAME))
+                .components(new Components().addSecuritySchemes(SCHEME_NAME,
+                        new SecurityScheme()
+                                .name(SCHEME_NAME)
+                                .type(SecurityScheme.Type.HTTP)
+                                .bearerFormat(BEARER_FORMAT)
+                                .in(SecurityScheme.In.HEADER)
+                                .scheme(SCHEME)
+                ))
+                .info(info)
+                .servers(List.of(devServer));
     }
 }
-

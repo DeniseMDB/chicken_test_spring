@@ -59,7 +59,7 @@ public class FarmReportController {
     @GetMapping("/{id}/csv")
     public ResponseEntity<String> generateCsvFarmReport(@PathVariable Long id) {
         try {
-            String filePath = "/farm_report_" + id + ".csv";
+            String filePath = "farm_report_" + id + ".csv";
             Path path = Paths.get("reports");
             if (!Files.exists(path)) {
                 Files.createDirectories(path);

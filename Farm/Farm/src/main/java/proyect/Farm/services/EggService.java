@@ -6,6 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Egg;
 import proyect.Farm.entities.Farm;
+import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.EggRepository;
 import proyect.Farm.repositories.FarmRepository;
 
@@ -42,7 +43,7 @@ public class EggService {
         if (oPfarm.isPresent()) {
             Farm farm = oPfarm.get();
             egg.setFarm(farm);
-        }else throw new RuntimeException("Error de farm");
+        }else throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         return eggRepository.save(egg);
     }
 

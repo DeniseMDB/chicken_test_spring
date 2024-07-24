@@ -1,8 +1,8 @@
 package proyect.Farm.business;
 
 public interface ISimulation {
-    public void startSimulation(Long farmId, Integer speed);
-    public void stopSimulation(Long farmId);
-    public void pauseSimulation(Long farmId);
-    public void resumeSimulation(Long farmId);
+    void startSimulation(Long farmId, Integer speed);
+    void stopSimulation(Long farmId);
+    void pauseSimulation(Long farmId);
+    void resumeSimulation(Long farmId);
 }

@@ -2,11 +2,14 @@ package proyect.Farm.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "sales")
 @Data
+@NoArgsConstructor
 @JsonIgnoreProperties({"farm"})
 public class Sales {
     @Id
@@ -27,6 +30,4 @@ public class Sales {
         this.price = price;
     }
 
-    public Sales() {
-    }
 }

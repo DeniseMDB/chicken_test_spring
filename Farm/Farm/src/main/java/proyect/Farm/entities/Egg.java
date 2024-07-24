@@ -32,17 +32,15 @@ public class Egg {
     @Schema(description = "Indicates if the egg was hatched or bought", example = "hatched")
     private String hatchedOrBought;
 
+    @ManyToOne
+    @JoinColumn(name = "farm_id")
+    @Schema(description = "The farm to which the egg belongs")
+    private Farm farm;
+
     public Egg(Integer ageInDays, Double price, Integer daysToHatch, String hatchedOrBought) {
         this.ageInDays = ageInDays;
         this.price = price;
         this.daysToHatch = daysToHatch;
         this.hatchedOrBought = hatchedOrBought;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "farm_id")
-    @Schema(description = "The farm to which the egg belongs")
-    private Farm farm;
-    public Egg() {
     }
 }

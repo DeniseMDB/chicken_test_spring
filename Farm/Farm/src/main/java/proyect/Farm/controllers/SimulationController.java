@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proyect.Farm.business.ISimulation;
@@ -20,11 +21,7 @@ import java.util.NoSuchElementException;
 public class SimulationController {
 
     @Autowired
-    ISimulation iSimulation;
-
-    public SimulationController(SimulationService simulationService) {
-        this.iSimulation = simulationService;
-    }
+    SimulationService simulationService;
 
     @Operation(summary = "Start the simulation for a farm")
     @ApiResponses(value = {
@@ -39,8 +36,8 @@ public class SimulationController {
     @PostMapping("/start/{farmId}")
     public ResponseEntity<String> startSimulation(@RequestParam("speed") Integer speed, @PathVariable Long farmId) {
         try {
-            iSimulation.startSimulation(farmId, speed);
-            return ResponseEntity.ok("Simulation started for farm " + farmId + " every " + speed + " second one day will go by.");
+            simulationService.startSimulation(farmId, speed);
+            return ResponseEntity.status(HttpStatus.OK).build();//("Simulation started for farm " + farmId + " every " + speed + " second one day will go by.");
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm not found: " + farmId);
         } catch (Exception e) {
@@ -61,7 +58,7 @@ public class SimulationController {
     @PostMapping("/stop/{farmId}")
     public ResponseEntity<String> stopSimulation(@PathVariable Long farmId) {
         try {
-            iSimulation.stopSimulation(farmId);
+            simulationService.stopSimulation(farmId);
             return ResponseEntity.ok("Simulation stopped for farm " + farmId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm not found: " + farmId);
@@ -83,7 +80,7 @@ public class SimulationController {
     @PostMapping("/pause/{farmId}")
     public ResponseEntity<String> pauseSimulation(@PathVariable Long farmId) {
         try {
-            iSimulation.pauseSimulation(farmId);
+            simulationService.pauseSimulation(farmId);
             return ResponseEntity.ok("Simulation paused for farm " + farmId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm not found: " + farmId);
@@ -105,7 +102,7 @@ public class SimulationController {
     @PostMapping("/resume/{farmId}")
     public ResponseEntity<String> resumeSimulation(@PathVariable Long farmId) {
         try {
-            iSimulation.resumeSimulation(farmId);
+            simulationService.resumeSimulation(farmId);
             return ResponseEntity.ok("Simulation resumed for farm " + farmId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("Farm not found: " + farmId);

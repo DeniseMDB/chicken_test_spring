@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Table(name = "farm")
 @Data
+@NoArgsConstructor
 @Schema(description = "Represents a farm that manages chickens and eggs")
 public class Farm {
     @Id
@@ -41,6 +43,4 @@ public class Farm {
     @Schema(description = "List of sales made by the farm")
     private List<Sales> sales;
 
-    public Farm() {
-    }
 }

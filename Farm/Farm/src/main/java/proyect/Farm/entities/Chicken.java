@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import java.util.Random;
@@ -11,6 +12,7 @@ import java.util.Random;
 @Entity
 @Table(name = "chickens")
 @Data
+@NoArgsConstructor
 @PropertySource("farm.properties")
 @JsonIgnoreProperties({"farm"})
 @Schema(description = "Represents a chicken in the farm")
@@ -54,10 +56,6 @@ public class Chicken {
         this.daysToLive= daysToLive;
         this.kindOfChicken= kindOfChicken;
         this.price= price;
-    }
-
-
-    public Chicken() {
     }
 }
 

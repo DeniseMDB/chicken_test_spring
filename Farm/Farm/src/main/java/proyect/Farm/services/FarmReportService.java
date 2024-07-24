@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Farm;
 import proyect.Farm.entities.FarmReport;
 import proyect.Farm.entities.Sales;
+import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.FarmReportRepository;
 import proyect.Farm.repositories.FarmRepository;
 import proyect.Farm.repositories.SalesRepository;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@PropertySource("farm.properties")
 public class FarmReportService {
     @Autowired
     private FarmRepository farmRepository;
@@ -27,8 +27,6 @@ public class FarmReportService {
     private SalesRepository salesRepository;
     @Autowired
     private FarmReportRepository farmReportRepository;
-    @Value("${FILE.PATH.CSV}")
-    private String localPath;
 
     public FarmReport generateFarmReport(Long farmId) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
@@ -64,14 +62,14 @@ public class FarmReportService {
                     farm.getDaysInBusiness());
             return farmReportRepository.save(farmReport);
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         }
     }
 
         public void writeFarmReportToCSV(Long farmId,String filePath) {
             FarmReport farmReport = generateFarmReport(farmId);
 
-            try (CSVWriter writer = new CSVWriter(new FileWriter(this.localPath + filePath))) {
+            try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
                 String[] header = { "Money", "Chickens", "Eggs", "Total Eggs Sold", "Total Chickens Sold",
                         "Total Eggs Revenue", "Total Chickens Revenue", "Eggs Capacity",
                         "Chickens Capacity", "Days in Business" };

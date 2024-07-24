@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Chicken;
 import proyect.Farm.entities.Farm;
+import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.ChickenRepository;
 import proyect.Farm.repositories.FarmRepository;
 
@@ -59,7 +60,7 @@ public class ChickenService {
         if (oPfarm.isPresent()) {
             Farm farm = oPfarm.get();
             chicken.setFarm(farm);
-        }else throw new RuntimeException("Error de farm");
+        }else throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         return chickenRepository.save(chicken);
     }
     public void delete(Chicken chicken, Long id) {
@@ -71,6 +72,6 @@ public class ChickenService {
             farm.setChickens(chickens);
             farmRepository.save(farm);
             chickenRepository.deleteById(chicken.getId());
-        } else throw new RuntimeException("Error de farm");
+        } else throw new FarmNotFoundException("Can't find Farm with ID: "+id);
     }
 }

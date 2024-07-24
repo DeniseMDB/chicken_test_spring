@@ -14,6 +14,7 @@ public class SimulationService implements Runnable, ISimulation {
     private final Object lock = new Object();
     private Long currentFarmId;
     private Integer speedSimulation;
+    private final int millis= 1000;
 
     public void startSimulation(Long farmId, Integer speed) {
         this.currentFarmId = farmId;
@@ -55,7 +56,7 @@ public class SimulationService implements Runnable, ISimulation {
                 farmService.simulateDay(currentFarmId);
             }
             try {
-                Thread.sleep(speedSimulation*1000); //
+                Thread.sleep(speedSimulation*millis); //
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

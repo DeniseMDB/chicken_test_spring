@@ -2,9 +2,11 @@ package proyect.Farm.services;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import proyect.Farm.entities.*;
+import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.*;
 
 import java.util.*;
@@ -27,38 +29,23 @@ public class FarmService {
     @Autowired
     private EggService eggService;
 
+    private static final double discount= 0.75;
+
     private static final Logger logger = LoggerFactory.getLogger(FarmService.class);
 
     public void simulateDay(Long farmId) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
         if (optionalFarm.isPresent()) {
             Farm farm = optionalFarm.get();
-            Integer chickensInStock = farm.getChickens().size(); // Inicializa la colección LAZY
-            Integer eggsInStock = farm.getEggs().size();// Inicializa la colección LAZY
-            if (eggsInStock >= farm.getMaxEggs()){ //control de stock de huevos
-                double calculatedAmount = eggsInStock * 0.20;
-                Integer eggsToSell = (int) Math.round(calculatedAmount);
-                sellEggs(eggsToSell,farm.getId(),0.75);
-                logger.info("SE HAN VENDIDO "+ eggsToSell+" HUEVOS CON DESCUENTO POR ALCANZAR EL LIMITE DE STOCK DE LA GRANJA");
-            }
-            if (chickensInStock >= farm.getMaxChickens()){ //control de stock de gallinas
-                double calculatedAmount = chickensInStock * 0.20;
-                Integer chickensToSell = (int) Math.round(calculatedAmount);
-                sellEggs(chickensToSell,farm.getId(),0.75);
-                logger.info("SE HAN VENDIDO "+ chickensToSell+" GALLINAS CON DESCUENTO POR ALCANZAR EL LIMITE DE STOCK DE LA GRANJA");
-            }
-            List<Chicken> deadChickens = chickenRepository.findChickensByStatus(farm.getId(), false);
-            if (!deadChickens.isEmpty()) { //desecha gallinas muertas
-                logger.info("SE DESECHARON "+ deadChickens.size()+" GALLINAS MUERTAS.");
-                for (Chicken chicken : deadChickens) {
-                    chickenService.delete(chicken,farm.getId());
-                }
-            }
+            handleStock(farm, "eggs");
+            handleStock(farm, "chickens");
+            discardDeadChickens(farm);
             ageChickens(farm);
             ageEggs(farm);
-            farm.setDaysInBusiness(farm.getDaysInBusiness() + 1);
-            farmRepository.save(farm);
-            logger.info("A FULL DAY HAS GONE BY.");
+            incrementFarmDaysInBusiness(farm);
+            logger.info("A full day has passed.");
+        } else{
+            throw new FarmNotFoundException("Can't find Farm with ID:" + farmId);
         }
     }
 
@@ -83,7 +70,7 @@ public class FarmService {
                 throw new RuntimeException("Not enough money to buy eggs");
             }
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+id);
         }
     }
 
@@ -104,7 +91,7 @@ public class FarmService {
                 throw new RuntimeException("Not enough money to buy chickens");
             }
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         }
     }
 
@@ -138,7 +125,7 @@ public class FarmService {
                 throw new RuntimeException("Not enough amount of eggs to sell");
             }
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         }
     }
 
@@ -172,7 +159,7 @@ public class FarmService {
                 throw new RuntimeException("Not enough amount of chickens to sell");
             }
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+farmId);
         }
     }
 
@@ -229,8 +216,49 @@ public class FarmService {
         if (optionalFarm.isPresent()) {
             return optionalFarm.get();
         } else {
-            throw new RuntimeException("Farm does not exist");
+            throw new FarmNotFoundException("Can't find Farm with ID: "+id);
         }
     }
+
+    private void handleStock(Farm farm, String stockType) {
+        int itemsInStock = stockType.equals("eggs") ? farm.getEggs().size() : farm.getChickens().size();
+        int maxItems = stockType.equals("eggs") ? farm.getMaxEggs() : farm.getMaxChickens();
+        if (itemsInStock < maxItems) {
+            return;
+        }
+
+        int itemsToSell = calculateItemsToSell(itemsInStock);
+        if (stockType.equals("eggs")) {
+            sellEggs(itemsToSell, farm.getId(), discount);
+            logger.info("Sold " + itemsToSell + " eggs due to reaching the farm's stock limit.");
+        } else {
+            sellChickens(itemsToSell, farm.getId(), discount);
+            logger.info("Sold " + itemsToSell + " chickens due to reaching the farm's stock limit.");
+        }
+    }
+
+    private void discardDeadChickens(Farm farm) {
+        List<Chicken> deadChickens = chickenRepository.findChickensByStatus(farm.getId(), false);
+        if (deadChickens.isEmpty()) {
+            return;
+        }
+
+        logger.info("Discarded " + deadChickens.size() + " dead chickens.");
+        for (Chicken chicken : deadChickens) {
+            chickenService.delete(chicken, farm.getId());
+        }
+    }
+
+    private int calculateItemsToSell(int itemsInStock) {
+        double calculatedAmount = itemsInStock * 0.20;
+        return (int) Math.round(calculatedAmount);
+    }
+
+    private void incrementFarmDaysInBusiness(Farm farm) {
+        farm.setDaysInBusiness(farm.getDaysInBusiness() + 1);
+        farmRepository.save(farm);
+    }
+
+
 
 }

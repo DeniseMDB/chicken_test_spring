@@ -3,12 +3,14 @@ package proyect.Farm.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Table(name = "reports")
 @Data
+@NoArgsConstructor
 public class FarmReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +38,5 @@ public class FarmReport {
         this.eggsCapacity = eggsCapacity;
         this.chickensCapacity =chickensCapacity;
         this.daysInBusiness = daysInBusiness;
-    }
-
-    public FarmReport() {
     }
 }
