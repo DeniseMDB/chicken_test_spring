@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.PropertySource;
 @Data
 @PropertySource("farm.properties")
 @JsonIgnoreProperties({"farm"})
+@NoArgsConstructor
 @Schema(description = "Represents an egg in the farm")
 public class Egg {
     @Id
