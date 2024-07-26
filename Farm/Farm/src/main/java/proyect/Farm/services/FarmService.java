@@ -2,13 +2,13 @@ package proyect.Farm.services;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import proyect.Farm.entities.*;
 import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import org.slf4j.Logger;
 
@@ -97,7 +97,7 @@ public class FarmService {
 
     public void sellEggs(Integer amount, Long farmId, Double discount) {
         Optional<Farm> optionalFarm = farmRepository.findById(farmId);
-        Double discountToApply = 0.0;
+        double discountToApply;
         if (discount == null) {
             discountToApply = 1.00;
         }else{
@@ -258,7 +258,5 @@ public class FarmService {
         farm.setDaysInBusiness(farm.getDaysInBusiness() + 1);
         farmRepository.save(farm);
     }
-
-
 
 }

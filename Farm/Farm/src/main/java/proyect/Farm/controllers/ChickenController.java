@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/chickens")
 @Tag(name = "Chicken Controller", description = "Controls to manage chickens in the farm")
+@SecurityRequirement(name = "basicAuth")
 public class ChickenController {
     @Autowired
     private ChickenService chickenService;
@@ -59,11 +61,11 @@ public class ChickenController {
 
     @Operation(summary = "Create a new chicken", description = "Create a new chicken for a specific farm",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Request body to create new farm",
+                    description = "Request body to create new chicken",
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(value = "{\"ageInDays\": 21, \"kindOfChicken\": \"bought\", \"price\": 45.0}")
+                            examples = @ExampleObject(value = "{\"ageInDays\": 21, \"kindOfChicken\": \"born\", \"price\": 45.0}")
                     )))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Chicken created successfully",

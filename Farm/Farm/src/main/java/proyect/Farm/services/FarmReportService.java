@@ -1,9 +1,11 @@
 package proyect.Farm.services;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Farm;
 import proyect.Farm.entities.FarmReport;
@@ -12,10 +14,9 @@ import proyect.Farm.exceptions.FarmNotFoundException;
 import proyect.Farm.repositories.FarmReportRepository;
 import proyect.Farm.repositories.FarmRepository;
 import proyect.Farm.repositories.SalesRepository;
-import proyect.Farm.repositories.SalesRepository;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,31 +67,39 @@ public class FarmReportService {
         }
     }
 
-        public void writeFarmReportToCSV(Long farmId,String filePath) {
-            FarmReport farmReport = generateFarmReport(farmId);
+    public void writeFarmReportToCSV(Long farmId, HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+        FarmReport farmReport = generateFarmReport(farmId);
 
-            try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
-                String[] header = { "Money", "Chickens", "Eggs", "Total Eggs Sold", "Total Chickens Sold",
-                        "Total Eggs Revenue", "Total Chickens Revenue", "Eggs Capacity",
-                        "Chickens Capacity", "Days in Business" };
-                writer.writeNext(header);
+        List<FarmReport> farmReportList = new ArrayList<>();
+        farmReportList.add(farmReport);
 
+        String[] header = { "Money", "Chickens", "Eggs", "Total Eggs Sold", "Total Chickens Sold",
+                "Total Eggs Revenue", "Total Chickens Revenue", "Eggs Capacity",
+                "Chickens Capacity", "Days in Business" };
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"farm_report_" + farmId + ".csv\"");
+
+        try (CSVWriter writer = new CSVWriter(response.getWriter())) {
+            writer.writeNext(header);
+
+            for (FarmReport report : farmReportList) {
                 String[] data = {
-                        String.valueOf(farmReport.getMoney()),
-                        String.valueOf(farmReport.getCurrentChickens()),
-                        String.valueOf(farmReport.getCurrentEggs()),
-                        String.valueOf(farmReport.getTotalEggsSold()),
-                        String.valueOf(farmReport.getTotalChickensSold()),
-                        String.valueOf(farmReport.getTotalEggsRevenue()),
-                        String.valueOf(farmReport.getTotalChickensRevenue()),
-                        String.valueOf(farmReport.getEggsCapacity()),
-                        String.valueOf(farmReport.getChickensCapacity()),
-                        String.valueOf(farmReport.getDaysInBusiness())
+                        String.valueOf(report.getMoney()),
+                        String.valueOf(report.getCurrentChickens()),
+                        String.valueOf(report.getCurrentEggs()),
+                        String.valueOf(report.getTotalEggsSold()),
+                        String.valueOf(report.getTotalChickensSold()),
+                        String.valueOf(report.getTotalEggsRevenue()),
+                        String.valueOf(report.getTotalChickensRevenue()),
+                        String.valueOf(report.getEggsCapacity()),
+                        String.valueOf(report.getChickensCapacity()),
+                        String.valueOf(report.getDaysInBusiness())
                 };
-
                 writer.writeNext(data);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error while writing CSV", e);
         }
+    }
     }

@@ -45,12 +45,12 @@
         <div class="col-md-8 themed-grid-col text-center">
             <h2 style="margin-top: 40px; font-family: math;font-weight: bold;" >Simulation Controls</h2>
             <div class="pb-3 simulation">
-                <form th:action="@{/api/simulation/start/{farmId}(farmId=${farm.id})}" method="post">
+                <form th:action="@{/api/simulation/start/{farmId}(farmId=${farmid.id})}" method="post">
                     <label for="speed" style="font-family: math">Speed (every x amount of seconds a day goes by):</label>
                     <input class="mx-6" type="number" id="speed" name="speed" min="1" aria-label="Speed" placeholder="Enter a number" required>
                     <button class="btn btn-success rounded-pill px-3" type="submit" style="margin-right: 10px;margin-left: 10px;border-style: outset;">Start</button>
                 </form>
-                <form th:action="@{api/simulation/stop/{farmId}(farmId=${farm.id})}" method="post">
+                <form th:action="@{/api/simulation/stop/{farmId}(farmId=${farmid.id})}" method="post">
                     <button class="btn btn-danger rounded-pill px-3" type="submit" style="border-style: outset">Stop</button>
                 </form>
             </div>

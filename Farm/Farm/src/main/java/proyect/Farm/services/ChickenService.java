@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import proyect.Farm.entities.Chicken;
 import proyect.Farm.entities.Farm;

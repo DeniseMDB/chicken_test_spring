@@ -6,18 +6,19 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import proyect.Farm.business.ISimulation;
 import proyect.Farm.services.SimulationService;
-import java.util.NoSuchElementException;
+import proyect.Farm.exceptions.FarmNotFoundException;
 
 @RestController
 @RequestMapping("/api/simulation")
 @Tag(name = "Simulation Controller", description = "Simulates the passing of time (by days).")
+@SecurityRequirement(name = "basicAuth")
 public class SimulationController {
 
     @Autowired
@@ -35,14 +36,8 @@ public class SimulationController {
                     content = @Content) })
     @PostMapping("/start/{farmId}")
     public ResponseEntity<String> startSimulation(@RequestParam("speed") Integer speed, @PathVariable Long farmId) {
-        try {
-            simulationService.startSimulation(farmId, speed);
-            return ResponseEntity.status(HttpStatus.OK).build();//("Simulation started for farm " + farmId + " every " + speed + " second one day will go by.");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm not found: " + farmId);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error starting simulation: " + e.getMessage());
-        }
+        simulationService.startSimulation(farmId, speed);
+        return ResponseEntity.status(HttpStatus.OK).body("Simulation started for farm " + farmId + " every " + speed + " second one day will go by.");
     }
 
     @Operation(summary = "Stop the simulation for a farm")
@@ -57,14 +52,8 @@ public class SimulationController {
                     content = @Content) })
     @PostMapping("/stop/{farmId}")
     public ResponseEntity<String> stopSimulation(@PathVariable Long farmId) {
-        try {
-            simulationService.stopSimulation(farmId);
-            return ResponseEntity.ok("Simulation stopped for farm " + farmId);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm not found: " + farmId);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error stopping simulation: " + e.getMessage());
-        }
+        simulationService.stopSimulation(farmId);
+        return ResponseEntity.ok("Simulation stopped for farm " + farmId);
     }
 
     @Operation(summary = "Pause the simulation for a farm")
@@ -79,14 +68,8 @@ public class SimulationController {
                     content = @Content) })
     @PostMapping("/pause/{farmId}")
     public ResponseEntity<String> pauseSimulation(@PathVariable Long farmId) {
-        try {
-            simulationService.pauseSimulation(farmId);
-            return ResponseEntity.ok("Simulation paused for farm " + farmId);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm not found: " + farmId);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error pausing simulation: " + e.getMessage());
-        }
+        simulationService.pauseSimulation(farmId);
+        return ResponseEntity.ok("Simulation paused for farm " + farmId);
     }
 
     @Operation(summary = "Resume the simulation for a farm")
@@ -101,13 +84,7 @@ public class SimulationController {
                     content = @Content) })
     @PostMapping("/resume/{farmId}")
     public ResponseEntity<String> resumeSimulation(@PathVariable Long farmId) {
-        try {
-            simulationService.resumeSimulation(farmId);
-            return ResponseEntity.ok("Simulation resumed for farm " + farmId);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm not found: " + farmId);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error resuming simulation: " + e.getMessage());
-        }
+        simulationService.resumeSimulation(farmId);
+        return ResponseEntity.ok("Simulation resumed for farm " + farmId);
     }
 }

@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proyect.Farm.entities.Farm;
@@ -16,12 +16,12 @@ import proyect.Farm.services.ChickenService;
 import proyect.Farm.services.FarmService;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("api/farm")
 @Tag(name = "Farm Controller", description = "Controls to manage a farm")
+@SecurityRequirement(name = "basicAuth")
 public class FarmController {
     @Autowired
     private FarmService farmService;
@@ -44,12 +44,8 @@ public class FarmController {
                     content = @Content) })
     @PostMapping
     public ResponseEntity<Farm> createFarm(@RequestBody Farm farm) {
-        try {
-            Farm savedFarm = farmService.saveFarm(farm);
-            return ResponseEntity.ok(savedFarm);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Farm savedFarm = farmService.saveFarm(farm);
+        return ResponseEntity.ok(savedFarm);
     }
 
     @Operation(summary = "Find farm by ID")
@@ -63,17 +59,11 @@ public class FarmController {
                     content = @Content) })
     @GetMapping("/{farmId}")
     public ResponseEntity<Farm> findById(@PathVariable Long farmId) {
-        try {
-            Optional<Farm> farmOpt = Optional.ofNullable(farmService.findById(farmId));
-            if (farmOpt.isPresent()) {
-                return ResponseEntity.ok(farmOpt.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        Optional<Farm> farmOpt = Optional.ofNullable(farmService.findById(farmId));
+        if (farmOpt.isPresent()) {
+            return ResponseEntity.ok(farmOpt.get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -98,14 +88,8 @@ public class FarmController {
     public ResponseEntity<String> buyEggs(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Integer amount = Integer.parseInt(body.get("amount").toString());
         Double pricePerEgg = Double.parseDouble(body.get("pricePerEgg").toString());
-        try {
-            farmService.buyEggs(amount, pricePerEgg, id);
-            return ResponseEntity.ok(amount + " Eggs have been added to the farm stock");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Bad request");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error buying eggs: " + e.getMessage());
-        }
+        farmService.buyEggs(amount, pricePerEgg, id);
+        return ResponseEntity.ok(amount + " Eggs have been added to the farm stock");
     }
 
     @Operation(summary = "Buy chickens for the farm", description = "Choose amount to sell to earn money",
@@ -130,14 +114,8 @@ public class FarmController {
         Integer amount = Integer.parseInt(body.get("amount").toString());
         Double pricePerChicken = Double.parseDouble(body.get("pricePerChicken").toString());
         Integer chickenAgeInDays = Integer.parseInt(body.get("chickenAgeInDays").toString());
-        try {
-            farmService.buyChickens(amount, pricePerChicken, chickenAgeInDays, id);
-            return ResponseEntity.ok("Chickens bought successfully ."+amount+" chickens have been added to stock.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Bad request");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error buying chickens: " + e.getMessage());
-        }
+        farmService.buyChickens(amount, pricePerChicken, chickenAgeInDays, id);
+        return ResponseEntity.ok("Chickens bought successfully. " + amount + " chickens have been added to stock.");
     }
 
     @Operation(summary = "Sell eggs from the farm", description = "Choose amount to sell to earn money",
@@ -160,17 +138,11 @@ public class FarmController {
     @PostMapping("/{id}/sell-eggs")
     public ResponseEntity<String> sellEggs(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Integer amount = Integer.parseInt(body.get("amount").toString());
-        try {
-            farmService.sellEggs(amount, id,null);
-            return ResponseEntity.ok("Eggs sold successfully");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm or eggs not found");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error selling eggs: " + e.getMessage());
-        }
+        farmService.sellEggs(amount, id, null);
+        return ResponseEntity.ok("Eggs sold successfully");
     }
 
-    @Operation(summary = "Sell chickens from the farm",description = "Choose amount to sell to earn money",
+    @Operation(summary = "Sell chickens from the farm", description = "Choose amount to sell to earn money",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Request body for amount to sell input",
                     required = true,
@@ -190,13 +162,7 @@ public class FarmController {
     @PostMapping("/{id}/sell-chickens")
     public ResponseEntity<String> sellChickens(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Integer amount = Integer.parseInt(body.get("amount").toString());
-        try {
-            farmService.sellChickens(amount, id, null);
-            return ResponseEntity.ok("Chickens sold successfully");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body("Farm or eggs not found");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error selling chickens: " + e.getMessage());
-        }
+        farmService.sellChickens(amount, id, null);
+        return ResponseEntity.ok("Chickens sold successfully");
     }
 }
