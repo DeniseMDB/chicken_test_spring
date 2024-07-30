@@ -1,6 +1,6 @@
 # Proyecto de simulacro de manejo de una granja
 
-## Descripciónhttps://github.com/DeniseMDB
+## Descripción
 
 La aplicación "Farm" fue desarrollada en Spring Boot, permite gestionar una granja, incluyendo operaciones como la compra y venta de animales, gestión de recursos, y generación de informes. Además, ofrece una funcionalidad de simulación del paso del tiempo, donde la velocidad del paso de los días se ingresa por parámetro en segundos. Esta simulación refleja cambios en el estado de las gallinas y los huevos: las gallinas ponen huevos, envejecen, mueren, los huevos se convierten en gallinas, y se regula el stock para no alcanzar la capacidad máxima de la granja. La aplicación está diseñada para ser fácilmente extensible y ofrece una interfaz amigable utilizando Thymeleaf para el front-end y Swagger/OpenAPI para la documentación de la API.
 
