@@ -1,15 +1,18 @@
 # Proyecto de simulacro de manejo de una granja
 
-## Descripción
+## Descripciónhttps://github.com/DeniseMDB
 
-La aplicación Farm Management es una API desarrollada en Spring Boot que permite gestionar una granja, incluyendo operaciones como la compra y venta de animales, gestión de recursos, y generación de informes. Esta aplicación está diseñada para ser fácilmente extensible y ofrece una interfaz amigable utilizando Thymeleaf para el front-end y Swagger/OpenAPI para la documentación de la API.
+La aplicación "Farm" fue desarrollada en Spring Boot, permite gestionar una granja, incluyendo operaciones como la compra y venta de animales, gestión de recursos, y generación de informes. Además, ofrece una funcionalidad de simulación del paso del tiempo, donde la velocidad del paso de los días se ingresa por parámetro en segundos. Esta simulación refleja cambios en el estado de las gallinas y los huevos: las gallinas ponen huevos, envejecen, mueren, los huevos se convierten en gallinas, y se regula el stock para no alcanzar la capacidad máxima de la granja. La aplicación está diseñada para ser fácilmente extensible y ofrece una interfaz amigable utilizando Thymeleaf para el front-end y Swagger/OpenAPI para la documentación de la API.
+
+
+<img width="872" alt="Front-Farm" src="https://github.com/user-attachments/assets/52fcad04-e414-45e0-b6f9-713c408b668c">
 
 ## Características
 
 - Gestión de granjas, animales y recursos.
 - Operaciones CRUD para entidades clave.
 - Generación de informes en formato CSV.
-- Autenticación y autorización utilizando JWT.
+- Autenticación y autorización utilizando Basic Auth.
 - Front-end basado en Thymeleaf y Bootstrap.
 - Base de datos en memoria H2 para desarrollo y pruebas.
 - **Persistencia de datos**: Uso de JPA/Hibernate para la persistencia y manejo de datos.
